@@ -109,13 +109,7 @@ impl GameBoard {
         let down = (self.height + y - 1) % self.height;
         let right = (x + 1) % self.width;
         let left = (self.width + x - 1) % self.width;
-/*
-        println!(r#"Counting neighbors of ({}, {}).
-up: {},
-down: {},
-right: {},
-left: {},
-                 "#, x, y, up, down, right, left);*/
+        
         self.get(x,     up  ).unwrap().count() +
         self.get(right, up  ).unwrap().count() +
         self.get(right, y   ).unwrap().count() +
