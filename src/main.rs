@@ -16,11 +16,12 @@ fn main() {
     board.set(86, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
 
     loop {
-        print!("{}[3J{}", 27 as char, board);
-
         board.ready();
-        board.step();
 
+        print!("{}[3J{}", 27 as char, board);
+        
+        board.step();
+        
         thread::sleep(Duration::from_millis(70));
     }
 }

@@ -151,8 +151,11 @@ impl fmt::Display for GameBoard {
             self.tiles.iter().enumerate()
                 .map(|(i, tile)| {
                     let mut icon = String::from(match tile.get() {
-                        LifeCell::Alive(_) => "#",
-                        LifeCell::Dead(_)  => "_",
+                        LifeCell::Alive(NextState::Alive) => "#",
+                        LifeCell::Alive(NextState::Dead)  => "-",
+                        LifeCell::Dead(NextState::Alive)  => "+",
+                        LifeCell::Dead(NextState::Dead)   => "_",
+                        _ => " ",
                     });
 
                     if (i + 1) % self.width == 0 {
