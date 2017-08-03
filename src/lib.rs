@@ -1,6 +1,11 @@
 use std::cell::Cell;
 use std::fmt;
 
+const ALIVE: &str = "#";
+const DEAD: &str = "_";
+const GROWING: &str = "+";
+const DYING: &str = "-";
+
 #[derive(Clone, Copy)]
 pub enum NextState {
     Alive, Dead, Unknown
@@ -151,10 +156,10 @@ impl fmt::Display for GameBoard {
             self.tiles.iter().enumerate()
                 .map(|(i, tile)| {
                     let mut icon = String::from(match tile.get() {
-                        LifeCell::Alive(NextState::Alive) => "#",
-                        LifeCell::Alive(NextState::Dead)  => "-",
-                        LifeCell::Dead(NextState::Alive)  => "+",
-                        LifeCell::Dead(NextState::Dead)   => "_",
+                        LifeCell::Alive(NextState::Alive) => ALIVE,
+                        LifeCell::Alive(NextState::Dead)  => DYING,
+                        LifeCell::Dead(NextState::Alive)  => GROWING,
+                        LifeCell::Dead(NextState::Dead)   => DEAD,
                         _ => " ",
                     });
 
