@@ -6,30 +6,11 @@ use std::time::Duration;
 fn main() {
     let mut board = GameBoard::new(10, 10);
 
-    {
-        let cell = board.get_mut(2, 0).unwrap();
-        *cell = LifeCell::Alive(NextState::Unknown);
-    }
-
-    {
-        let cell = board.get_mut(2, 1).unwrap();
-        *cell = LifeCell::Alive(NextState::Unknown);
-    }
-    
-    {
-        let cell = board.get_mut(2, 2).unwrap();
-        *cell = LifeCell::Alive(NextState::Unknown);
-    }
-
-    {
-        let cell = board.get_mut(1, 2).unwrap();
-        *cell = LifeCell::Alive(NextState::Unknown);
-    }
-
-    {
-        let cell = board.get_mut(0, 1).unwrap();
-        *cell = LifeCell::Alive(NextState::Unknown);
-    }
+    board.set(2, 0, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(2, 1, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(2, 2, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(1, 2, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(0, 1, LifeCell::Alive(NextState::Unknown)).unwrap();
 
     loop {
         println!("{}", board);
@@ -133,11 +114,13 @@ impl GameBoard {
     }
 
 
-    fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut LifeCell> {
-        Some(match self.tiles.get_mut(y * self.width + x) {
+    fn set(&self, x: usize, y: usize, value: LifeCell) -> Result<(), &str> {
+        match self.tiles.get(y * self.width + x) {
             Some(v) => v,
-            None    => return None,
-        }.get_mut())
+            None    => return Err("Coordinates out of bounds"),
+        }.set(value);
+
+        Ok(())
     }
 
     fn count_neighbors(&self, index: usize) -> u32 {
