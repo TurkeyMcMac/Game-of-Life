@@ -4,13 +4,15 @@ use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let mut board = GameBoard::new(10, 10);
+    let mut board = GameBoard::new(170, 60);
 
-    board.set(2, 0, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(2, 1, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(2, 2, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(1, 2, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(0, 1, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(80, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(81, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(81, 23, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(83, 24, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(84, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(85, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
+    board.set(86, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
 
     loop {
         println!("{}", board);
@@ -18,7 +20,7 @@ fn main() {
         board.ready();
         board.step();
 
-        thread::sleep(Duration::from_millis(100));
+//        thread::sleep(Duration::from_millis(100));
     }
 }
 
@@ -178,8 +180,8 @@ impl fmt::Display for GameBoard {
             self.tiles.iter().enumerate()
                 .map(|(i, tile)| {
                     let mut icon = String::from(match tile.get() {
-                        LifeCell::Alive(_) => "# ",
-                        LifeCell::Dead(_)  => "_ ",
+                        LifeCell::Alive(_) => "#",
+                        LifeCell::Dead(_)  => "_",
                     });
 
                     if (i + 1) % self.width == 0 {
