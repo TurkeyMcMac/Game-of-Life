@@ -4,10 +4,10 @@ use std::io;
 use std::io::{Read, BufRead, BufReader};
 use std::fs::File;
 
-const ALIVE: &str = "█";
-const DEAD: &str = " ";
-const GROWING: &str = "▫";
-const DYING: &str = "▪";
+const ALIVE: &str = "██";
+const DEAD: &str = "  ";
+const GROWING: &str = "░░";
+const DYING: &str = "▓▓";
 
 const READ_ALIVE: u8 = b'#';
 const READ_DEAD: u8 = b'-';
