@@ -42,10 +42,18 @@ impl LifeCell {
 
     fn decide(&self, neighbors: u32) -> NextState {
         match self {
-            &LifeCell::Alive(_) if neighbors < 2 || neighbors > 3 => NextState::Dead,
-            &LifeCell::Alive(_) => NextState::Alive,
-            &LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
-            &LifeCell::Dead(_) => NextState::Dead,
+            &LifeCell::Alive(_) =>
+                if neighbors < 2 || neighbors > 3 {
+                    NextState::Dead
+                } else {
+                    NextState::Alive
+                },
+            &LifeCell::Dead(_) =>
+                if neighbors == 3 {
+                    NextState::Alive
+                } else {
+                    NextState::Dead
+                },
         }
     }
 
