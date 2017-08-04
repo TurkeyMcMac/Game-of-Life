@@ -4,10 +4,6 @@ use std::io;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 
-const LIVE_MAX: u32 = 3;
-const LIVE_MIN: u32 = 2;
-const BIRTH: u32 = 3;
-
 const ALIVE: &str = "██";
 const DEAD: &str = "  ";
 const GROWING: &str = "░░";
@@ -45,19 +41,10 @@ impl LifeCell {
     }
 
     fn decide(&self, neighbors: u32) -> NextState {
-        match self {
-            &LifeCell::Alive(_) =>
-                if neighbors < LIVE_MIN || neighbors > LIVE_MAX {
-                    NextState::Dead
-                } else {
-                    NextState::Alive
-                },
-            &LifeCell::Dead(_) =>
-                if neighbors == BIRTH {
-                    NextState::Alive
-                } else {
-                    NextState::Dead
-                },
+       match self {
+            &LifeCell::Alive(_) if neighbors == 2 || neighbors == 3 => NextState::Alive,
+            &LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
+            _ => NextState::Dead,
         }
     }
 
