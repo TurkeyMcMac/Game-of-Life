@@ -19,10 +19,10 @@ pub enum NextState {
 
 impl NextState {
     fn realize(&self) -> Result<LifeCell, StateChangeError> {
-        match self {
-            &NextState::Alive   => Ok(LifeCell::Alive(NextState::Unknown)),
-            &NextState::Dead    => Ok(LifeCell::Dead(NextState::Unknown)),
-            &NextState::Unknown => Err(StateChangeError),
+        match *self {
+            NextState::Alive   => Ok(LifeCell::Alive(NextState::Unknown)),
+            NextState::Dead    => Ok(LifeCell::Dead(NextState::Unknown)),
+            NextState::Unknown => Err(StateChangeError),
         }
     }
 }
@@ -34,16 +34,16 @@ pub enum LifeCell {
 
 impl LifeCell {
     fn count(&self) -> u32 {
-        match self {
-            &LifeCell::Alive(_) => 1,
-            &LifeCell::Dead(_)  => 0,
+        match *self {
+            LifeCell::Alive(_) => 1,
+            LifeCell::Dead(_)  => 0,
         }
     }
 
     fn decide(&self, neighbors: u32) -> NextState {
-       match self {
-            &LifeCell::Alive(_) if neighbors == 2 || neighbors == 3 => NextState::Alive,
-            &LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
+       match *self {
+            LifeCell::Alive(_) if neighbors == 2 || neighbors == 3 => NextState::Alive,
+            LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
             _ => NextState::Dead,
         }
     }
@@ -51,27 +51,27 @@ impl LifeCell {
     fn ready(&self, neighbors: u32) -> LifeCell {
         let next = self.decide(neighbors);
 
-        match self {
-            &LifeCell::Alive(_) => LifeCell::Alive(next),
-            &LifeCell::Dead(_)  => LifeCell::Dead(next),
+        match *self {
+            LifeCell::Alive(_) => LifeCell::Alive(next),
+            LifeCell::Dead(_)  => LifeCell::Dead(next),
         }
     }
 
     fn step(&self) -> Result<LifeCell, StateChangeError> {
-        match self {
-            &LifeCell::Alive(into) => into.realize(),
-            &LifeCell::Dead(into)  => into.realize(),
+        match *self {
+            LifeCell::Alive(into) => into.realize(),
+            LifeCell::Dead(into)  => into.realize(),
         }
     }
 }
 
 impl fmt::Display for LifeCell {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", match self {
-            &LifeCell::Alive(NextState::Alive) => ALIVE,
-            &LifeCell::Alive(NextState::Dead)  => DYING,
-            &LifeCell::Dead(NextState::Alive)  => GROWING,
-            &LifeCell::Dead(NextState::Dead)   => DEAD,
+        write!(f, "{}", match *self {
+            LifeCell::Alive(NextState::Alive) => ALIVE,
+            LifeCell::Alive(NextState::Dead)  => DYING,
+            LifeCell::Dead(NextState::Alive)  => GROWING,
+            LifeCell::Dead(NextState::Dead)   => DEAD,
             _ => "?",
         })
     }
