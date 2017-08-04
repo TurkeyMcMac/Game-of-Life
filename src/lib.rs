@@ -1,10 +1,10 @@
 use std::cell::Cell;
 use std::fmt;
 
-const ALIVE: &str = "#";
-const DEAD: &str = "_";
-const GROWING: &str = "+";
-const DYING: &str = "-";
+const ALIVE: &str = "█";
+const DEAD: &str = " ";
+const GROWING: &str = "▫";
+const DYING: &str = "▪";
 
 #[derive(Clone, Copy)]
 pub enum NextState {
@@ -160,7 +160,7 @@ impl fmt::Display for GameBoard {
                         LifeCell::Alive(NextState::Dead)  => DYING,
                         LifeCell::Dead(NextState::Alive)  => GROWING,
                         LifeCell::Dead(NextState::Dead)   => DEAD,
-                        _ => " ",
+                        _ => "?",
                     });
 
                     if (i + 1) % self.width == 0 {
