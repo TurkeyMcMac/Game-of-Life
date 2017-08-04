@@ -1,7 +1,7 @@
 use std::cell::Cell;
 use std::fmt;
 use std::io;
-use std::io::{Read, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 const ALIVE: &str = "██";
