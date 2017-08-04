@@ -159,6 +159,11 @@ impl GameBoard {
         Ok(())
     }
 
+    unsafe fn get_unchecked(&self, x: usize, y: usize) -> LifeCell {
+        self.tiles.get_unchecked(y * self.width + x).get()
+    }
+
+
     fn count_neighbors(&self, index: usize) -> u32 {
         let (x, y) = self.coords(index);
 
@@ -167,14 +172,16 @@ impl GameBoard {
         let right = (x + 1) % self.width;
         let left = (self.width + x - 1) % self.width;
         
-        self.get(x,     up  ).unwrap().count() +
-        self.get(right, up  ).unwrap().count() +
-        self.get(right, y   ).unwrap().count() +
-        self.get(right, down).unwrap().count() +
-        self.get(x,     down).unwrap().count() +
-        self.get(left,  down).unwrap().count() +
-        self.get(left,  y   ).unwrap().count() +
-        self.get(left,  up  ).unwrap().count()
+        unsafe {
+            self.get_unchecked(x,     up  ).count() +
+            self.get_unchecked(right, up  ).count() +
+            self.get_unchecked(right, y   ).count() +
+            self.get_unchecked(right, down).count() +
+            self.get_unchecked(x,     down).count() +
+            self.get_unchecked(left,  down).count() +
+            self.get_unchecked(left,  y   ).count() +
+            self.get_unchecked(left,  up  ).count()
+        }
     }
 
     fn coords(&self, index: usize) -> (usize, usize) {
