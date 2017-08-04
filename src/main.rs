@@ -16,7 +16,7 @@ fn main() {
     loop {
         board.ready();
 
-        print!("{}[3J{}", 27 as char, board);
+        print!("{}[2J{}", 27 as char, board);
         
         board.step();
         
