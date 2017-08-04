@@ -1,19 +1,17 @@
 extern crate game_of_life;
-use game_of_life::{GameBoard, LifeCell, NextState};
+use game_of_life::GameBoard;
 
+use std::env;
+use std::fs::File;
 use std::thread;
 use std::time::Duration;
 
 fn main() {
-    let mut board = GameBoard::new(170, 60);
+    let mut file = File::open(&env::args().skip(1).next()
+            .expect("Please provide a filename as a first argument"))
+        .expect("Couldn't find file");
 
-    board.set(80, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(81, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(81, 23, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(83, 24, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(84, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(85, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
-    board.set(86, 25, LifeCell::Alive(NextState::Unknown)).unwrap();
+    let mut board = GameBoard::from_file(&mut file).unwrap();
 
     loop {
         board.ready();

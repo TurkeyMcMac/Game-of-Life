@@ -1,13 +1,16 @@
 use std::cell::Cell;
 use std::fmt;
+use std::io;
+use std::io::{Read, BufRead, BufReader};
+use std::fs::File;
 
 const ALIVE: &str = "█";
 const DEAD: &str = " ";
 const GROWING: &str = "▫";
 const DYING: &str = "▪";
 
-const READ_ALIVE: char = '#';
-const READ_DEAD: char = '-';
+const READ_ALIVE: u8 = b'#';
+const READ_DEAD: u8 = b'-';
 
 #[derive(Clone, Copy)]
 pub enum NextState {
@@ -95,6 +98,54 @@ impl GameBoard {
         }
         
         GameBoard { width, height, tiles }
+    }
+
+    pub fn from_file(file: &mut File) -> io::Result<GameBoard> {
+        let mut reader = BufReader::new(file);
+
+        let mut first_line = String::new();
+
+        reader.read_line(&mut first_line)?;
+
+        let mut parameters = first_line.split_whitespace()
+            .map(|num_string| if let Ok(v) = num_string.parse::<usize>() { v } else { 0 });
+
+        let width = parameters.next().unwrap_or(0);
+        let height = parameters.next().unwrap_or(0);
+
+        let tiles = reader.lines()
+            .flat_map(|line| {
+                let line = line.expect("Problem reading line");
+                assert!(line.len() == width, "line length {} != width {}", line.len(), width);
+                
+                line.into_bytes().into_iter()
+                    .filter_map(|byte| match byte {
+                        READ_ALIVE => Some(Cell::new(LifeCell::Alive(NextState::Unknown))),
+                        READ_DEAD  => Some(Cell::new(LifeCell::Dead(NextState::Unknown))),
+                        _          => None,
+                    })
+            })
+            .collect::<Vec<Cell<LifeCell>>>();
+
+        assert!(tiles.len() == width * height);
+/*
+
+        let last_line_length = 0;
+        let line_length = 0;
+
+        let mut tiles = reader.bytes()
+            .filter_map(|byte| match byte {
+                Ok(READ_ALIVE) => Some(Cell::new(LifeCell::Alive(NextState::Unknown))),
+                Ok(READ_DEAD)  => Some(Cell::new(LifeCell::Dead(NextState::Unknown))),
+                Ok(b'\n')      => {
+                    
+                }
+                _              => None,
+            })
+            .collect::<Vec<Cell<LifeCell>>>();
+        tiles.truncate(width * height);
+*/
+        Ok(GameBoard { width, height, tiles })
     }
 
     pub fn get(&self, x: usize, y: usize) -> Option<LifeCell> {
