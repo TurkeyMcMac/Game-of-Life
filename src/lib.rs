@@ -65,6 +65,18 @@ impl LifeCell {
     }
 }
 
+impl fmt::Display for LifeCell {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", match self {
+            &LifeCell::Alive(NextState::Alive) => ALIVE,
+            &LifeCell::Alive(NextState::Dead)  => DYING,
+            &LifeCell::Dead(NextState::Alive)  => GROWING,
+            &LifeCell::Dead(NextState::Dead)   => DEAD,
+            _ => "?",
+        })
+    }
+}
+
 use std::error::Error;
 
 #[derive(Clone, Copy, Debug)]
@@ -195,13 +207,7 @@ impl fmt::Display for GameBoard {
         write!(f, "{}",
             self.tiles.iter().enumerate()
                 .map(|(i, tile)| {
-                    let mut icon = String::from(match tile.get() {
-                        LifeCell::Alive(NextState::Alive) => ALIVE,
-                        LifeCell::Alive(NextState::Dead)  => DYING,
-                        LifeCell::Dead(NextState::Alive)  => GROWING,
-                        LifeCell::Dead(NextState::Dead)   => DEAD,
-                        _ => "?",
-                    });
+                    let mut icon = tile.get().to_string();
 
                     if (i + 1) % self.width == 0 {
                         icon += "\n";
