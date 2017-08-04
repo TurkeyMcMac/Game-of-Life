@@ -6,6 +6,9 @@ const DEAD: &str = " ";
 const GROWING: &str = "▫";
 const DYING: &str = "▪";
 
+const READ_ALIVE: char = '#';
+const READ_DEAD: char = '-';
+
 #[derive(Clone, Copy)]
 pub enum NextState {
     Alive, Dead, Unknown
@@ -34,13 +37,17 @@ impl LifeCell {
         }
     }
 
-    fn ready(&self, neighbors: u32) -> LifeCell {
-        let next = match self {
+    fn decide(&self, neighbors: u32) -> NextState {
+        match self {
             &LifeCell::Alive(_) if neighbors < 2 || neighbors > 3 => NextState::Dead,
             &LifeCell::Alive(_) => NextState::Alive,
             &LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
             &LifeCell::Dead(_) => NextState::Dead,
-        };
+        }
+    }
+
+    fn ready(&self, neighbors: u32) -> LifeCell {
+        let next = self.decide(neighbors);
 
         match self {
             &LifeCell::Alive(_) => LifeCell::Alive(next),
