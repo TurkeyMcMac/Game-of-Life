@@ -127,23 +127,6 @@ impl GameBoard {
             .collect::<Vec<Cell<LifeCell>>>();
 
         assert!(tiles.len() == width * height);
-/*
-
-        let last_line_length = 0;
-        let line_length = 0;
-
-        let mut tiles = reader.bytes()
-            .filter_map(|byte| match byte {
-                Ok(READ_ALIVE) => Some(Cell::new(LifeCell::Alive(NextState::Unknown))),
-                Ok(READ_DEAD)  => Some(Cell::new(LifeCell::Dead(NextState::Unknown))),
-                Ok(b'\n')      => {
-                    
-                }
-                _              => None,
-            })
-            .collect::<Vec<Cell<LifeCell>>>();
-        tiles.truncate(width * height);
-*/
         Ok(GameBoard { width, height, tiles })
     }
 
