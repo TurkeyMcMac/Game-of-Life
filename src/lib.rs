@@ -121,8 +121,8 @@ impl GameBoard {
         let mut parameters = first_line.split_whitespace()
             .map(|num_string| if let Ok(v) = num_string.parse::<usize>() { v } else { 0 });
 
-        let width = parameters.next().unwrap_or(0);
-        let height = parameters.next().unwrap_or(0);
+        let width = parameters.next().unwrap();
+        let height = parameters.next().unwrap();
 
         let tiles = reader.lines()
             .flat_map(|line| {
