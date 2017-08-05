@@ -12,7 +12,7 @@ const DYING: &str = "▓▓";
 const READ_ALIVE: u8 = b'=';
 const READ_DEAD: u8 = b'-';
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum CellState {
     Alive, Dead, Unknown
 }
@@ -38,12 +38,7 @@ impl LifeCell {
 
     pub fn dead(next: CellState) -> LifeCell { LifeCell { now: CellState::Dead, next } }
 
-    fn count(self) -> u32 {
-        match self.now {
-            CellState::Alive => 1,
-            _  => 0,
-        }
-    }
+    fn count(self) -> u32 { if self.now == CellState::Alive { 1 } else { 0 } }
 
     fn decide(self, neighbors: u32) -> CellState {
        match self.now {
@@ -54,12 +49,7 @@ impl LifeCell {
     }
 
     fn ready(self, neighbors: u32) -> LifeCell {
-        let next = self.decide(neighbors);
-
-        match self.now {
-            CellState::Alive => LifeCell { now: CellState::Alive, next },
-            _  => LifeCell { now: CellState::Dead, next },
-        }
+        LifeCell { now: self.now, next: self.decide(neighbors) }
     }
 
     fn step(self) -> Result<LifeCell, StateChangeError> { self.next.realize() }
