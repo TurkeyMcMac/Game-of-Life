@@ -13,65 +13,65 @@ const READ_ALIVE: u8 = b'=';
 const READ_DEAD: u8 = b'-';
 
 #[derive(Clone, Copy)]
-pub enum NextState {
+pub enum CellState {
     Alive, Dead, Unknown
 }
 
-impl NextState {
+impl CellState {
     fn realize(&self) -> Result<LifeCell, StateChangeError> {
         match *self {
-            NextState::Alive   => Ok(LifeCell::Alive(NextState::Unknown)),
-            NextState::Dead    => Ok(LifeCell::Dead(NextState::Unknown)),
-            NextState::Unknown => Err(StateChangeError),
+            CellState::Alive   => Ok(LifeCell::alive(CellState::Unknown)),
+            CellState::Dead    => Ok(LifeCell::dead(CellState::Unknown)),
+            CellState::Unknown => Err(StateChangeError),
         }
     }
 }
 
 #[derive(Clone, Copy)]
-pub enum LifeCell {
-    Alive(NextState), Dead(NextState)
+pub struct LifeCell {
+    now: CellState,
+    next: CellState,
 }
 
 impl LifeCell {
-    fn count(&self) -> u32 {
-        match *self {
-            LifeCell::Alive(_) => 1,
-            LifeCell::Dead(_)  => 0,
+    pub fn alive(next: CellState) -> LifeCell { LifeCell { now: CellState::Alive, next } }
+
+    pub fn dead(next: CellState) -> LifeCell { LifeCell { now: CellState::Dead, next } }
+
+    fn count(self) -> u32 {
+        match self.now {
+            CellState::Alive => 1,
+            _  => 0,
         }
     }
 
-    fn decide(&self, neighbors: u32) -> NextState {
-       match *self {
-            LifeCell::Alive(_) if neighbors == 2 || neighbors == 3 => NextState::Alive,
-            LifeCell::Dead(_) if neighbors == 3 => NextState::Alive,
-            _ => NextState::Dead,
+    fn decide(self, neighbors: u32) -> CellState {
+       match self.now {
+            CellState::Alive if neighbors == 2 || neighbors == 3 => CellState::Alive,
+            CellState::Dead if neighbors == 3 => CellState::Alive,
+            _ => CellState::Dead,
         }
     }
 
-    fn ready(&self, neighbors: u32) -> LifeCell {
+    fn ready(self, neighbors: u32) -> LifeCell {
         let next = self.decide(neighbors);
 
-        match *self {
-            LifeCell::Alive(_) => LifeCell::Alive(next),
-            LifeCell::Dead(_)  => LifeCell::Dead(next),
+        match self.now {
+            CellState::Alive => LifeCell { now: CellState::Alive, next },
+            _  => LifeCell { now: CellState::Dead, next },
         }
     }
 
-    fn step(&self) -> Result<LifeCell, StateChangeError> {
-        match *self {
-            LifeCell::Alive(into) => into.realize(),
-            LifeCell::Dead(into)  => into.realize(),
-        }
-    }
+    fn step(self) -> Result<LifeCell, StateChangeError> { self.next.realize() }
 }
 
 impl fmt::Display for LifeCell {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", match *self {
-            LifeCell::Alive(NextState::Alive) => ALIVE,
-            LifeCell::Alive(NextState::Dead)  => DYING,
-            LifeCell::Dead(NextState::Alive)  => GROWING,
-            LifeCell::Dead(NextState::Dead)   => DEAD,
+            LifeCell { now: CellState::Alive, next: CellState::Alive } => ALIVE,
+            LifeCell { now: CellState::Alive, next: CellState::Dead }  => DYING,
+            LifeCell { now: CellState::Dead, next: CellState::Alive }  => GROWING,
+            LifeCell { now: CellState::Dead, next: CellState::Dead }   => DEAD,
             _ => "?",
         })
     }
@@ -105,7 +105,7 @@ impl GameBoard {
         let mut tiles = Vec::with_capacity(tile_number);
 
         for _ in 0..tile_number {
-            tiles.push(Cell::new(LifeCell::Dead(NextState::Unknown)));
+            tiles.push(Cell::new(LifeCell::dead(CellState::Unknown)));
         }
         
         GameBoard { width, height, tiles }
@@ -131,8 +131,8 @@ impl GameBoard {
                 
                 line.into_bytes().into_iter()
                     .filter_map(|byte| match byte {
-                        READ_ALIVE => Some(Cell::new(LifeCell::Alive(NextState::Unknown))),
-                        READ_DEAD  => Some(Cell::new(LifeCell::Dead(NextState::Unknown))),
+                        READ_ALIVE => Some(Cell::new(LifeCell::alive(CellState::Unknown))),
+                        READ_DEAD  => Some(Cell::new(LifeCell::dead(CellState::Unknown))),
                         _          => None,
                     })
             })
